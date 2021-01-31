@@ -49,3 +49,8 @@ jobs:
         mkdir coverage
         find . -type f -name '*.gcno' -exec gcov -pb {} +
         mv *.gcov coverage
+
+    - name: upload code coverage
+      run: |
+        cd coverage
+        bash <(curl -s https://codecov.io/bash)
