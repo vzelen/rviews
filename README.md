@@ -1,6 +1,7 @@
 # Reference Views - C++ header-only library
 [![Language](https://img.shields.io/badge/C%2B%2B-17/20-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B#Standardization)
 [![Actions Status](https://github.com/pleaded/rviews/workflows/Ubuntu/badge.svg)](https://github.com/pleaded/rviews/workflows/Ubuntu/badge.svg)
+[![codecov](https://codecov.io/gh/vzelen/rviews/branch/master/graph/badge.svg)](https://codecov.io/gh/vzelen/rviews)
 
 ```
                        +---+        
