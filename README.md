@@ -19,7 +19,7 @@ Vector     +--------x---------x--------+
 View:      |   A*   |    B*   |    C*  |    
            +--------x---------x--------+    
 ```
-rviews (reference views) is a header-only C++17 library which allows to view an STL container via another STL container with lvalue semantics. E.g. you could view a list as it would be a vector, or even as it would be a map,or even both.
+rviews (reference views) is a header-only C++17 library that allows viewing an STL container via another STL container with lvalue semantics. E.g. you could view a list as it would be a vector, or even as it would be a map, or even both.
 
 ```c++
 std::list<char> data{'a', 'b', 'c'};
@@ -49,8 +49,7 @@ Please respect the `const`ness of keys in associate containers, all qualifiers a
 The usecases where you might want to use it:
 
 - there is a sequentially stored collection of components of type `T`, stored in `vector` or `list`, but semantically the type `T` has a "key"
-which would be good to use for an associative access. You could store the elements in a `map` or `unordered_map` instead in first place, but then you will loose
-the properties of sequential storage. Alternatively, there might be already an established C++ infrastructure where it is not possible
+which would be good to use for associative access. You could store the elements in a `map` or `unordered_map` instead in the first place, but then you will loose the properties of sequential storage. Alternatively, there might be already an established C++ infrastructure where it is not possible
 to easily change the underlying container types from a `vector` to a `map`. What you could do naturally - you could make an associate container and store pointer manually to original elements from a
 `vector`/`list`, but then you will always have to dereference the pointers. Moreover, you might want to add / remove elements via an associate view,
 and it would be beneficial in case the underlying sequential containers updates automatically. E.g. you have to manually keep the underlying sequential container of objects and the associate container of pointers to the objects in sync. So this is exactly what `rviews` library does, but also with reference semantics
@@ -103,7 +102,7 @@ This is a header-only library. So just include it:
 |`unordered_map_view.hpp`|`rviews::unordered_map_view(SourceContainer<T>, Key)`|
 |`unordered_multimap_view.hpp`|`rviews::unordered_multimap_view(SourceContainer<T>, Key)`|
 
-Each view accepts the source container (which will be viewed). Associate container accepts the key which is obtainable from the elements stored inside the source container in a form of a pointer to a member data field of `T` stored inside source container.
+Each view accepts the source container (which will be viewed). Associate container accepts the key which is obtainable from the elements stored inside the source container in a form of a pointer to a member data field of `T` stored inside the source container.
 
 Please find `example` folder. It contains a separate cmake project with `CMakeLists.txt` and shows how to include and use `rviews` library.
 
@@ -111,7 +110,7 @@ Please find `example` folder. It contains a separate cmake project with `CMakeLi
 target_link_libraries(your_project_name PUBLIC rviews)
 ```
 
-Note: the library in the development, so consider that during the usage. Most likely the views API remains stable, but there are a lot of underlying optimization which might be done under the hood, for example the ability of a view container to detect source container's relocations and do not recreate the internal view state after each change so agressively (instead, only when the invalidation of pointers really takes place).
+Note: the library in development, so consider that during the usage. Most likely the views API remains stable, but there are a lot of underlying optimization which might be done under the hood, for example, the ability of a view container to detect source container's relocations and do not recreate the internal view state after each change so aggressively (instead, only when the invalidation of pointers really takes place).
 
 # Tests & Code Coverage
 Tests are covering the usage of STL algorithms and STL container API itself on the viewed objects.
@@ -131,7 +130,7 @@ $ make coverage # it uses gcovr, so install it
 - [ ] `array` view
 - [ ] `set` view
 - [ ] `unordered_map` as a source
-- [ ] improve the performance of modification of source containers via a view container by reducing the amount of recreations of view container when source container does not reallocate
+- [ ] improve the performance of modification of source containers via a view container by reducing the number of recreations of view container when source container does not reallocate
 - [ ] reduce the amount of view container repopulation, almost always it is not needed 
 - [ ] improved tests for `map` as a source
 - [ ] `extract` for associate containers
@@ -139,13 +138,13 @@ $ make coverage # it uses gcovr, so install it
 - [ ] `try_emplace`
 - [ ] `insert_or_assign` - assigning value to a key which does not mathc with the value (e.g. obj has key = 5, while assinging this object to key = 2)
 - [ ] perfect forward more
-- [ ] add the syncronization between multiple views
+- [ ] add the synchronization between multiple views
 - [ ] different TODOs from the code, just grep `TODO`
 - [ ] add windows & macos builds in CI
 
 # Implementation details
 
-Under the hood a view containers stores pointer-like-types (`T*` or `T&`) to the original objects of target container:
+Under the hood a view containers stores pointer-like-types (`T*` or `T&`) to the original objects of the target container:
 
 | View Container | Stored object type | Internal storage |
 | ----------| -------| ------------|
@@ -156,11 +155,11 @@ Under the hood a view containers stores pointer-like-types (`T*` or `T&`) to the
 | `unordered_map_view` | `T&` | `std::unordered_map` |
 | `unordered_multimap_view` | `T&` | `std::unordered_multimap` |
 
-E.g. `vector_view` stores raw pointers to original target containers, and `map_view` stores references to the objects of original target container.
+E.g. `vector_view` stores raw pointers to original target containers, and `map_view` stores references to the objects of the original target container.
 
-Each view container interanlly has a container of view type, e.g. `vector_view` has `std::vector` inside, and `map_view` has `std::map` inside, etc. Thus, the view library entirely relies on the STL implementation.
+Each view container internally has a container of view type, e.g. `vector_view` has `std::vector` inside, and `map_view` has `std::map` inside, etc. Thus, the view library entirely relies on the STL implementation.
 
-Why some view containers (mostly, associate ones) stores references (`T&`) instead of raw pointers (`T*`)? Because the underlying stored type of those is `std::pair<const KeyType, T>` and we don't have a syntax to obtain lvalue reference from a pointer if it's placed inside an aggregate type. 
+Why some view containers (mostly, associate ones) store references (`T&`) instead of raw pointers (`T*`)? Because the underlying stored type of those is `std::pair<const KeyType, T>` and we don't have a syntax to obtain lvalue reference from a pointer if it's placed inside an aggregate type. 
 
 Consider the following example:
 ```c++
@@ -187,7 +186,7 @@ void foo() {
 ```
 This works fine, we store a pointer `int * ptr` inside `Wrapper` object, and provide an lvalue reference in `get()` method.
 
-Now assume our function `get()` returns not just an lvalue reference but an additional return parameter (let's say a `char`). We don't have in-language support for functions with multuple return parameters, so we either return a `struct` or `pair`. For the sake of example, lets return a `pair`. Keep your eyes on what just happened: we had a function `get()` returning one parameter, now we _just_ return something _additionally_, sounds conceptually simple, isn't it?
+Now assume our function `get()` returns not just an lvalue reference but an additional return parameter (let's say a `char`). We don't have in-language support for functions with multiple return parameters, so we either return a `struct` or `pair`. For the sake of example, let's return a `pair`. Keep your eyes on what just happened: we had a function `get()` returning one parameter, now we _just_ return something _additionally_, sounds conceptually simple, isn't it?
 
 ```c++
 template<typename T>
@@ -215,15 +214,15 @@ void foo() {
 }
 ```
 
-We store a pointer? We can "dereference" it to get lvalue.
-We store a pair of something and a pointer? We can't return a pair of something and "dereferenced lvalue".
+Do we store a pointer? We can "dereference" it to get lvalue.
+Do we store a pair of something and a pointer? We can't return a pair of something and "dereferenced lvalue".
 
 Formally speaking: because `std::pair<A, B*>` and `std::pair<A, B&>` are different types. 
 Informally speaking: we can create `int&` from `int*` by `*ptr` syntax, and we cant create `something + int&` from `something + int*`? Because we don't have this `+` and ability to return multiple values.
 
-Even worse, de-facto `std::pair<something, T*>` and `std::pair<something, T&>` have same memory layout (but this is dangerous information which should be ignored) - with a pointer in `second` in both cases. But we cant "cast" one type into another (even if they store exactly same bytes on low-level), any kind of `reinterpret_cast` would be UB here.
+Even worse, de-facto `std::pair<something, T*>` and `std::pair<something, T&>` have the same memory layout (but this is dangerous information which should be ignored) - with a pointer in `second` in both cases. But we can't "cast" one type into another (even if they store the same bytes on low-level), any kind of `reinterpret_cast` would be UB here.
 
-Fundamentally speaking, the answer for such situation is "just don't do that, look, you have 2 different types, so distinguish between them explicitly". Yes, and no.
+Fundamentally speaking, the answer for such a situation is "just don't do that, look, you have 2 different types, so distinguish between them explicitly". Yes, and no.
 
 Can we provide an implcit access syntax for a user if we store just a pointer and nothing more? Yes, user can do this:
 ```c++
@@ -237,7 +236,7 @@ Can we achive the same in case we store _a bit more_ information than just a poi
 auto& [key, obj] = wrapper.get();
 f(obj.field);
 ```
-No, this is not possible, because we did `auto&` instead of `auto`. That means that we "referencing" to some "existing lvalue in memory". But `wrapper` stores a pointer, while user API requires an explicit access to an object (`f(obj.field)`, and not `f(obj->field)`, or `f(obj.get().field)`, or any kind of other proxy middleware). So `get()` needs to "dereference" to get lvalue from a stored pointer. All good, this is how it worked with previous "original" example above without additional `char` keys. But now we have a `char` key next to a pointer and need a kind of a pair. This mandates us to create a _new_ object. Because the process of (1) obtaining an lvalue `T&` from `T*` by `*ptr` syntax and the process of (2) returning two parameters from a function - those 2 processes can't be combined.
+No, this is not possible, because we did `auto&` instead of `auto`. That means that we "referencing" to some "existing lvalue in memory". But `wrapper` stores a pointer, while user API requires an explicit access to an object (`f(obj.field)`, and not `f(obj->field)`, or `f(obj.get().field)`, or any kind of other proxy middleware). So `get()` needs to "dereference" to get lvalue from a stored pointer. All good, this is how it worked with the previous "original" example above without additional `char` keys. But now we have a `char` key next to a pointer and need a kind of a pair. This mandates us to create a _new_ object. Because the process of (1) obtaining an lvalue `T&` from `T*` by `*ptr` syntax and the process of (2) returning two parameters from a function - those 2 processes can't be combined.
 
 Of course a user could do that:
 ```c++
@@ -246,7 +245,7 @@ auto key = tmp.first;
 auto& obj = tmp.second;
 f(obj.field);
 ```
-e.g. obtain the pair clasically by value, then bind `first` by-value and `second` by-ref. This is an approach to consider `first` as a very lightweigt type which can be copied around and which lvalueness is not required. It works, but then we're missing one big user - C++ range-based loops.
+e.g. obtain the pair classically by value, then bind `first` by-value and `second` by-ref. This is an approach to consider `first` as a very lightweight type that can be copied around and which lvalueness is not required. It works, but then we're missing one big user - C++ range-based loops.
 
 ```c++
 {
@@ -287,7 +286,7 @@ So there several points to consider:
 
 Which is not achievable.
 
-Overall picture of available options:
+The overall picture of available options:
 
 |User code| Internal implementation| lvalueness| # of returned objects |
 |---------|------------------------|-----------|------|
@@ -331,9 +330,9 @@ std::pair<char, int&> Wrapper::get() {
 }
 ```
 
-Thus the amount of arguments (which equals 2) in a user facing API (with no-proxy access) mandates our internal implementation to store `T&`.
+Thus the amount of arguments (which equals 2) in a user-facing API (with no-proxy access) mandates our internal implementation to store `T&`.
 
-Above examples describes the implementation of the view container iterator. Specifically, `Wrapper` would be an view container iterator, and `get()` is its `operator*`.
+The above examples describes the implementation of the view container iterator. Specifically, `Wrapper` would be a view container iterator, and `get()` is its `operator*`.
 
 For example, in `vector_view` we store `std::vector<T*>`:
 ```c++
@@ -365,6 +364,6 @@ int& ref1 = *std::begin(view); // not **std::begin(view)
 
 # Acknowledgements 
 - Thanks for guys from Boost doing Multi-index library https://www.boost.org/doc/libs/1_62_0/libs/multi_index/doc/index.html, rviews is mostly inspired by that, but maybe tries to do only a subset of Multi-index capabilities and in a bit simpler way :)
-- Thanks to Jonathan Müller and https://www.jonathanmueller.dev/talk/cppnow2018/ for structuring the pointer-like-types world in C++! Especially in the light of what we should store inside the views if we want to provide the implicit access for the user (and especially for containers which store pairs).
-- Thanks to https://github.com/erikvalkering/smartref for the inspiration of the idea regarding "referenceness", and for the amazing talk in CppCon! Maybe it is possible to implement rviews on top of smartrefs?
-- Thanks to https://github.com/filipdutescu/modern-cpp-template for the template, current repe structure is based on that.
+- Thanks to Jonathan Müller and https://www.jonathanmueller.dev/talk/cppnow2018/ for structuring the pointer-like-types world in C++! Especially in the light of what we should store inside the views if we want to provide implicit access for the user (and especially for containers that store pairs).
+- Thanks to https://github.com/erikvalkering/smartref for the inspiration of the idea regarding "referenceness", and for the amazing talk at CppCon! Maybe it is possible to implement rviews on top of smartrefs?
+- Thanks to https://github.com/filipdutescu/modern-cpp-template for the template, the current repository structure is based on that.
